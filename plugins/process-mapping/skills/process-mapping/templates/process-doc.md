@@ -41,6 +41,13 @@ Dokument k ruční editaci k výkresu [{proces}-to-be.html]({proces}-to-be.html)
 | Role | Oprávnění | Hlavní činnosti |
 |---|---|---|
 
+## Odpovědnosti (RACI)
+
+Na každém řádku právě jedno A.
+
+| Krok nebo výstup | R (dělá) | A (odpovídá) | C (konzultuje) | I (informován) |
+|---|---|---|---|---|
+
 ## Výjimky
 
 | Situace | Jak se řeší dnes | Četnost | Řešení v to-be |
