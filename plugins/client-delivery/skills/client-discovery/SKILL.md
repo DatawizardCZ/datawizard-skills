@@ -1,6 +1,6 @@
 ---
 name: client-discovery
-description: Guides AI through a structured client discovery process — from interviewing domain experts to creating formal process definitions, business analysis, compliance checks, and product design. Use when conducting discovery sessions, interviewing stakeholders, formalizing processes from raw input, creating process definitions, or when the user mentions discovery, interview, process definition, or hands the laptop to someone else.
+description: Guides AI through a structured client discovery process — from interviewing domain experts to creating formal process definitions, business analysis, compliance checks, and product design. Use when conducting discovery sessions, interviewing stakeholders, formalizing processes from raw input, creating process definitions, or when the user mentions discovery, interview, process definition, or hands the laptop to someone else. For mapping and drawing a single business process (roles, handoffs, as-is/to-be, swimlane, BPMN) use process-mapping.
 ---
 
 # Client Discovery-to-Design
@@ -8,6 +8,8 @@ description: Guides AI through a structured client discovery process — from in
 AI-assisted methodology for transforming raw domain knowledge into implementable product specifications. Works across any domain — not industry-specific.
 
 For detailed phase descriptions, checklists, and anti-patterns, see [methodology.md](methodology.md).
+
+> Mapping and drawing business processes lives in the `process-mapping` plugin. A process definition from this skill is a valid input for its as-is phase.
 
 ## Recognize the Phase
 

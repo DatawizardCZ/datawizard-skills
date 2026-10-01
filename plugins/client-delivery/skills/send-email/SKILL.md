@@ -19,6 +19,7 @@ Připravíš email z Markdown draftu. Výchozí výstup je otevření zprávy v 
 |--------|-----------|-----|
 | `outlook` (výchozí) | Uživatel chce otevřít v Outlooku | `--format outlook` |
 | `text` | Uživatel říká "jenom text", "zkopíruju si to sám", "nechci Outlook" | `--format text` |
+| inline obrázky | Draft má v těle `![popis](cesta.png)` a obrázky mají být uvnitř mailu | jiný skript, viz níže |
 
 Pokud uživatel nespecifikuje, použij `outlook`.
 
@@ -44,6 +45,41 @@ python "<SKILL_DIR>/scripts/open-in-outlook.py" "<cesta-k-md-souboru>" \
   --attachment "/cesta/k/priloha1.pdf" \
   --attachment "/cesta/k/priloha2.docx"
 ```
+
+### Obrázky v těle mailu (inline)
+
+Když má být screenshot **uvnitř** mailu, ne jako příloha, napiš ho do draftu
+markdownem na samostatný řádek:
+
+```markdown
+![Popis obrázku](img/01-screenshot.png)
+```
+
+a pusť druhý skript:
+
+```bash
+python "<SKILL_DIR>/scripts/open-in-outlook-inline.py" "<cesta-k-md-souboru>"
+
+# jen vyrobit .eml a nesahat na Outlook (kontrola před importem)
+python "<SKILL_DIR>/scripts/open-in-outlook-inline.py" "<cesta>" --eml-only /tmp/draft.eml
+
+# šířka zobrazení obrázků, výchozí 720 px
+python "<SKILL_DIR>/scripts/open-in-outlook-inline.py" "<cesta>" --max-width 600
+```
+
+Proč zvlášť: `content` se do Outlooku posílá přes AppleScript a ten neumí přiřadit
+příloze Content-ID, takže obrázek se do těla nedostane. Base64 `data:` URI zase
+nezobrazí Outlook na Windows. Inline skript proto poskládá regulérní MIME zprávu
+(`multipart/related` s `cid:` odkazy) a naimportuje ji do složky Koncepty přes
+`import eml`. Obrázky pak vidí Outlook na Windows, Outlook Web i Gmail.
+
+Rozdíly proti `open-in-outlook.py`:
+
+- Zpráva **končí ve složce Koncepty**, neotevře se jako nové okno zprávy.
+- `attachments:` ve frontmatteru pořád funguje, jde o běžné přílohy vedle inline obrázků.
+- Pole `from:` se použije jako odesílatel zprávy (u druhého skriptu je jen pro kontext).
+
+Po importu řekni uživateli, ať koncept v Outlooku otevře, zkontroluje a pošle ručně.
 
 ### Varianta B: Email od nuly
 

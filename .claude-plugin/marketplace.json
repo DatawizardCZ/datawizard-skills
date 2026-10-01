@@ -106,6 +106,16 @@
       },
       "source": "./plugins/knowledge-capture",
       "category": "productivity"
+    },
+    {
+      "name": "process-mapping",
+      "description": "Process mapping end to end and process diagrams from one TOML spec (animated HTML drawing with step-through, static SVG, Figma swimlane with motion, Mermaid), plus a knowledge base of diagram types, notation, methods and tools.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Karel Simek"
+      },
+      "source": "./plugins/process-mapping",
+      "category": "productivity"
     }
   ]
 }
