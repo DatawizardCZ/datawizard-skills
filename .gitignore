@@ -4,3 +4,11 @@ node_modules/
 .env
 .env.local
 _archive/
+
+# lokální poznámky s odkazy na klientské projekty (repo je veřejné)
+*.local.*
+
+# generované a dočasné soubory
+__pycache__/
+*.pyc
+.playwright-mcp/
