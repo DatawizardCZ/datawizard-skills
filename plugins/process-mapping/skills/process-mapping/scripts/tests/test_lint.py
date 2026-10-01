@@ -50,3 +50,15 @@ class Lint(unittest.TestCase):
         self.assertFalse([i for i in found if i.level == "error"])
         for i in found:
             self.assertTrue("pomůže" in i.msg or "posuň" in i.msg or "zkrať" in i.msg, i.msg)
+
+    def test_long_czech_texts_get_advice(self):
+        d = big_spec(28, 7)
+        for i, s in enumerate(d["step"]):
+            s["title"] = f"Zkontroluje a zaeviduje přijatý doklad v účetním systému {i}"
+            s["sub"] = "Ověří náležitosti dokladu podle zákona o účetnictví a vnitřní směrnice"
+        d["step"][15]["items"][0]["title"] = "Kontrola náležitostí dokladu podle směrnice"
+        found = issues(d)
+        self.assertTrue(any("titulek" in i.msg for i in found))
+        self.assertTrue(any("dlaždice" in i.msg for i in found))
+        for i in found:
+            self.assertTrue("pomůže" in i.msg or "posuň" in i.msg or "zkrať" in i.msg, i.msg)

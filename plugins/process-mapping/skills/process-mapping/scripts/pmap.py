@@ -138,8 +138,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"CHYBA: {e}", file=sys.stderr)
         return 1
     out = Path(a.out) if a.out else default_out(spec, a.cmd, getattr(a, "part", ""))
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(content, encoding="utf-8")
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(content, encoding="utf-8")
+    except OSError as e:
+        print(f"CHYBA: výstup nejde zapsat: {out} ({e.strerror}); -o čeká cestu k souboru", file=sys.stderr)
+        return 1
     print(f"OK: {out}")
     return 0
 

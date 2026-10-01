@@ -150,3 +150,19 @@ class BigProcess(unittest.TestCase):
         self.assertLess(L["pace"], 1.0)
         self.assertLessEqual(L["duration"], 15.0)
         self.assertEqual(len(L["cards"]), 32)
+
+    def test_checks_and_loops_count_toward_the_15_s_bound(self):
+        a = big_spec(13, 4)
+        a["state"] = [{"name": f"Stav {j}", "at": f"k{j * 3}"} for j in range(5)]
+        for i in (2, 6, 9):
+            a["step"][i].update(type="checks", items=[{"title": f"Kontrola {j}", "sub": "něco"} for j in range(8)])
+        a["flow"] += [{"from": f"k{s}", "to": f"k{t}", "kind": "loop"} for s, t in ((3, 2), (5, 4), (8, 7), (11, 10))]
+        b = big_spec(32, 7)
+        for i in (3, 10, 20, 27):
+            b["step"][i].update(type="checks", items=[{"title": f"Kontrola {j}", "sub": "něco"} for j in range(6)])
+        b["flow"] += [{"from": f"k{s}", "to": f"k{t}", "kind": "loop"} for s, t in ((12, 11), (22, 21), (25, 24), (30, 29))]
+        for name, d in (("13 kroků", a), ("32 kroků", b)):
+            with self.subTest(name):
+                L = compute_layout(from_dict(d))
+                self.assertLess(L["pace"], 1.0)
+                self.assertLessEqual(L["duration"], 15.0)

@@ -71,7 +71,7 @@ Když si nejsi jistý, začni swimlanem. Pokrývá většinu firemních procesů
 
 - **K čemu:** vývojový diagram rozdělený do drah podle odpovědnosti. Ukáže předávky a čekání mezi odděleními [F 2.12]. Technika pochází ze 40. let a název jí dali Rummler a Brache v roce 1990 [F 2.11]. Pruh určuje, kdo kroky vykonává [F 3.13]. Dráhy mohou být vodorovné i svislé [F 3.15].
 - **Kdy ano:** doporučujeme jako výchozí typ pro každý proces s víc než jednou rolí nebo systémem.
-- **Kdy ne:** když nás zajímá čas a plýtvání s daty (value stream map) nebo jen stavy objektu (stavový diagram). Někteří výrobci nástrojů pruhy u většiny modelů nedoporučují kvůli pracnosti údržby [F 3.17].
+- **Kdy ne:** když nás zajímá čas a plýtvání s daty (value stream map) nebo jen stavy objektu (stavový diagram). Výrobce BPMN nástroje Camunda je u většiny modelů nedoporučuje kvůli pracnosti údržby [F 3.17].
 - **Úroveň detailu:** L2 (aktivity s rolemi).
 - **Publikum:** lidé v procesu, vlastník procesu, analytik, vývoj.
 - **Nástroj:** draw.io, Miro, Visio, Figma.

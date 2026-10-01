@@ -45,9 +45,11 @@ def check_layout(L: dict) -> List[Issue]:
     for c in cards:
         mt, ms = c["max_lines"]
         if len(c["title_lines"]) > mt:
-            warn(f"krok '{c['id']}': titulek má {len(c['title_lines'])} řádky, vejde se {mt}")
+            warn(f"krok '{c['id']}': titulek má {len(c['title_lines'])} řádky, vejde se {mt}; "
+                 f"zkrať ho, zbytek patří do sub nebo detail")
         if len(c["sub_lines"]) > ms:
-            warn(f"krok '{c['id']}': popis (sub) má {len(c['sub_lines'])} řádky, vejde se {ms}")
+            warn(f"krok '{c['id']}': popis (sub) má {len(c['sub_lines'])} řádky, vejde se {ms}; "
+                 f"zkrať ho, nebo text přesuň do detail")
         lim_t = text.chars_for(c["w"] - 24, text.TITLE_PX)
         lim_s = text.chars_for(c["w"] - 24, text.WARN_PX if c["type"] == "checks" else text.SUB_PX)
         if any(len(line) > lim_t for line in c["title_lines"]) or any(len(line) > lim_s for line in c["sub_lines"]):
@@ -55,7 +57,7 @@ def check_layout(L: dict) -> List[Issue]:
         for it in c["items"]:
             if (len(it["title"]) > text.chars_for(ITEM_W - 20, text.ITEM_TITLE_PX)
                     or len(it["sub"]) > text.chars_for(ITEM_W - 20, text.ITEM_SUB_PX)):
-                warn(f"krok '{c['id']}': položka „{it['title']}“ se nevejde do dlaždice")
+                warn(f"krok '{c['id']}': položka „{it['title']}“ se nevejde do dlaždice; zkrať ji")
     for sp in L["spans"]:
         if len(sp["text"]) > text.chars_for(sp["w"] - 28, text.SPAN_PX):
             warn(f"průběžná role v '{sp['lane']}': text se nevejde, zkrať ho")

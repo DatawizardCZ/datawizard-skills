@@ -21,7 +21,7 @@ Pravidla pro kreslení a pojmenování. Fakta mají ID z [research.md](research.
 9. **Víc konců pojmenuj koncovým stavem.** Každá koncová událost nese název stavu, jediná se nepojmenovává [F 3.9].
 10. **Diagram má mít jen jeden výklad** a logika má jít přečíst ze samotného diagramu [F 3.7]. Co se do karty nevejde, patří do detailu, ne mimo mapu.
 
-Pravidla 3 a 6 jsou naše konvence. Někteří výrobci BPMN nástrojů pruhy u většiny modelů nedoporučují kvůli údržbě [F 3.17]; pro mapování s lidmi z provozu je přesto doporučujeme, protože předávky jsou to první, na co se ptají.
+Pravidla 3 a 6 jsou naše konvence. Výrobce BPMN nástroje Camunda pruhy u většiny modelů nedoporučuje kvůli údržbě [F 3.17]; pro mapování s lidmi z provozu je přesto doporučujeme, protože předávky jsou to první, na co se ptají.
 
 <a id="urovne-detailu"></a>
 ## Úrovně detailu
@@ -75,7 +75,7 @@ Formální BPMN XML plugin nevyrábí. Pro IT a workflow engine použij nástroj
 | Značka | Význam | Kde |
 |---|---|---|
 | `??` | otevřená otázka, odpověď zatím nemáme | HTML, Mermaid, dokument procesu |
-| oranžová čárkovaná šipka s ↺ | smyčka, návrat k dřívějšímu kroku | HTML, SVG, Figma |
+| oranžová čárkovaná šipka; popisek v HTML a SVG začíná ↺ | smyčka, návrat k dřívějšímu kroku | HTML, SVG, Figma |
 | šedá čárkovaná šipka | alternativa, vedlejší větev | HTML, SVG, Figma |
 | zvýrazněný rámeček karty | rozhodnutí | HTML, SVG; ve Figmě jantarová barva |
 | kontrolní karta s dlaždicemi | několik souběžných kontrol (AND) | HTML, SVG, Figma |
@@ -83,7 +83,7 @@ Formální BPMN XML plugin nevyrábí. Pro IT a workflow engine použij nástroj
 | pruh stavů pod pruhy rolí | stavy objektu, rozsvěcují se s kroky | HTML, SVG, Figma |
 | barva pruhu ve Figmě | rozlišení rolí, šest barev dokola | Figma |
 
-Barva nikdy není jediný nositel významu: smyčka má navíc čárkování a symbol ↺, rozhodnutí tvar otázky a popsané výstupy (viz Přístupnost).
+Barva nikdy není jediný nositel významu: smyčka má navíc čárkování (a v HTML a SVG popisek se symbolem ↺), rozhodnutí tvar otázky a popsané výstupy (viz Přístupnost).
 
 ## Velikost diagramu
 

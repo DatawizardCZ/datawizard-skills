@@ -2,6 +2,50 @@ import unittest
 
 from pmaplib.model import SpecError, from_dict, load
 from tests.helpers import EXAMPLE, base_spec
+import tempfile
+from pathlib import Path
+
+
+def load_bytes(data: bytes):
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td, "x.process.toml")
+        p.write_bytes(data)
+        return load(p)
+
+
+class BadInput(unittest.TestCase):
+    def test_cp1250_file_is_a_clear_error(self):
+        src = '[process]\nid = "x"\ntitle = "Účetní proces"\n'.encode("cp1250")
+        with self.assertRaisesRegex(SpecError, "UTF-8"):
+            load_bytes(src)
+
+    def test_bom_is_accepted(self):
+        self.assertEqual(load_bytes(b"\xef\xbb\xbf" + Path(EXAMPLE).read_bytes()).id, "schvalovani-faktur")
+
+    def test_wrong_types_are_spec_errors(self):
+        cases = [("pain", 5), ("tools", 5), ("items", ["subtitle check"]), ("items", {"title": "x"}), ("next", "false")]
+        for key, val in cases:
+            with self.subTest(key=key, val=val):
+                d = base_spec()
+                d["step"][0][key] = val
+                if key == "items":
+                    d["step"][0]["type"] = "checks"
+                with self.assertRaises(SpecError):
+                    from_dict(d)
+        d = base_spec()
+        d["process"]["auto_flow"] = "false"
+        with self.assertRaisesRegex(SpecError, "true nebo false"):
+            from_dict(d)
+        d = base_spec()
+        d["lane"] = ["ucetni"]
+        with self.assertRaises(SpecError):
+            from_dict(d)
+
+    def test_list_in_single_line_field_is_joined(self):
+        d = base_spec()
+        d["step"][0]["today"] = ["e-mail", "papír"]
+        self.assertEqual(from_dict(d).steps[0].today, "e-mail, papír")
+
 
 
 class LoadExample(unittest.TestCase):

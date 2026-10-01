@@ -322,6 +322,9 @@ def _hash(script: str) -> str:
     return "'sha256-" + base64.b64encode(hashlib.sha256(script.encode("utf-8")).digest()).decode() + "'"
 
 
+JS_SLOTS = re.compile(r"/\*(DETAILS|STEPS|RING)\*/null|/\*(DURATION)\*/0")
+
+
 def _fill(tmpl: str, values: Dict[str, str]) -> str:
     """Jeden průchod: vložené hodnoty se už jako tokeny nevyhodnocují. Neznámý token = KeyError."""
     return re.sub(r"__([A-Z][A-Z_]*)__", lambda m: values[m.group(1)], tmpl)
@@ -340,11 +343,11 @@ def render_html(proc: Process, L: dict, links: Optional[List[Tuple[str, str]]] =
     fullscreen_script = ("(function () {\n" + fs + "\nwindow.initFullscreen = initFullscreen;"
                          "\nwindow.closeFullscreen = closeFullscreen;\n})();")
     ring = L["states"]["ring"]["steps"] if L["states"] else None
-    main_script = ((ASSETS / "process-map.js").read_text(encoding="utf-8")
-                   .replace("/*DETAILS*/null", _json(details(proc, L)))
-                   .replace("/*STEPS*/null", _json(step_list(L)))
-                   .replace("/*RING*/null", _json(ring))
-                   .replace("/*DURATION*/0", f"{L['duration']:g}"))
+    slots = {"DETAILS": _json(details(proc, L)), "STEPS": _json(step_list(L)), "RING": _json(ring),
+             "DURATION": f"{L['duration']:g}"}
+    # jeden průchod šablonou: značky v textu, který se právě vložil, se už nenahrazují
+    main_script = JS_SLOTS.sub(lambda m: slots[m.group(1) or m.group(2)],
+                               (ASSETS / "process-map.js").read_text(encoding="utf-8"))
     values = {
         "TITLE": esc(proc.title),
         "META": meta,

@@ -6,7 +6,7 @@ jsou v jednotkách SVG viewBoxu; Figma je násobí měřítkem. Předpokládá p
 from __future__ import annotations
 
 from math import hypot
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from . import text
 from .model import Flow, Process, Step
@@ -128,9 +128,18 @@ def lane_geometry(proc: Process) -> Dict[str, dict]:
     return out
 
 
-def pace(proc: Process) -> float:
-    """Násobek rytmu animace: 1 pro běžné procesy, méně pro dlouhé (celkem zhruba do 11 s)."""
-    return min(1.0, FLOW_BUDGET / (STEP_T * max(1, len(proc.steps))))
+def _step_extra(s: Step, loop_src: Set[str]) -> float:
+    """Čas navíc za krokem: dlaždice kontrolní karty a smyčka, která z kroku vede zpět."""
+    extra = CHECKS_EXTRA + ITEM_T * len(s.items) if s.type == "checks" else 0.0
+    return extra + (LOOP_EXTRA if s.id in loop_src else 0.0)
+
+
+def pace(proc: Process, flows: Sequence[Flow]) -> float:
+    """Násobek rytmu animace: 1 pro běžné procesy, méně pro dlouhé (celkem zhruba do 11 s).
+    Počítá i čas navíc u kontrolních karet a smyček, ne jen počet kroků."""
+    loop_src = {fl.src for fl in flows if fl.kind == "loop"}
+    raw = sum(STEP_T + _step_extra(s, loop_src) for s in proc.steps)
+    return min(1.0, FLOW_BUDGET / max(raw, STEP_T))
 
 
 def step_times(proc: Process, flows: Sequence[Flow], f: float) -> Dict[str, float]:
@@ -139,12 +148,7 @@ def step_times(proc: Process, flows: Sequence[Flow], f: float) -> Dict[str, floa
     t = FIRST_STEP_T
     for s in proc.steps:
         times[s.id] = _r(t)
-        extra = 0.0
-        if s.type == "checks":
-            extra += CHECKS_EXTRA + ITEM_T * len(s.items)
-        if s.id in loop_src:
-            extra += LOOP_EXTRA
-        t += (STEP_T + extra) * f
+        t += (STEP_T + _step_extra(s, loop_src)) * f
     return times
 
 
@@ -375,7 +379,7 @@ def subtitle(proc: Process) -> str:
 
 def compute_layout(proc: Process) -> dict:
     flows = proc.all_flows()
-    f = pace(proc)
+    f = pace(proc, flows)
     cols = assign_columns(proc)
     lanes = lane_geometry(proc)
     times = step_times(proc, flows, f)

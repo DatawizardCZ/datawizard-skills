@@ -44,6 +44,14 @@ class Figma(unittest.TestCase):
         self.assertEqual(code.count("\n"), template.count("\n"))   # žádný nový řádek ani kód navíc
         self.assertIn('X\\"; figma.root.remove(); //', code)
 
+    def test_marker_text_does_not_break_motion_code(self):
+        d = base_spec()
+        d["process"]["title"] = "Proces /*IDS*/null /*LAYOUT*/null konec"
+        L = compute_layout(from_dict(d))
+        code = figma_code(L, "motion", {"root": "1:1"})
+        self.assertEqual(embedded(code, "L"), json.loads(json.dumps(L)))
+        self.assertEqual(embedded(code, "IDS"), {"root": "1:1"})
+
     def test_motion_needs_ids(self):
         L = compute_layout(load(EXAMPLE))
         with self.assertRaisesRegex(SpecError, "--ids"):

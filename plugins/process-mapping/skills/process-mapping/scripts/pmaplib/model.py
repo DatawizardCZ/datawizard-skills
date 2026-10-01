@@ -164,7 +164,10 @@ class Process:
 
 
 def _line(v) -> str:
-    """Jednořádkový text: převede na řetězec a slije bílé znaky (konce řádků nesmí rozbít výstupy)."""
+    """Jednořádkový text: převede na řetězec a slije bílé znaky (konce řádků nesmí rozbít výstupy).
+    Seznam v jednořádkovém poli se spojí čárkami."""
+    if isinstance(v, list):
+        return ", ".join(_line(x) for x in v)
     return " ".join(str(v).split())
 
 
@@ -172,12 +175,21 @@ def _text(v) -> str:
     return str(v).strip()
 
 
-def _list(v) -> List[str]:
+def _list(v, key: str, where: str) -> List[str]:
     if v is None:
         return []
     if isinstance(v, str):
         return [_line(v)] if v.strip() else []
+    if not isinstance(v, list) or any(isinstance(x, (dict, list)) for x in v):
+        raise SpecError(f"{where}: {key} má být text nebo seznam textů, ne {v!r}")
     return [_line(x) for x in v]
+
+
+def _bool(d: dict, key: str, where: str) -> bool:
+    v = d.get(key, True)
+    if not isinstance(v, bool):
+        raise SpecError(f"{where}: {key} musí být true nebo false (bez uvozovek), ne {v!r}")
+    return v
 
 
 def _req(d: dict, key: str, where: str) -> str:
@@ -193,8 +205,8 @@ def _unknown(d: dict, kind: str, where: str, notes: List[str]) -> None:
 
 def _blocks(data: dict, key: str) -> list:
     v = data.get(key, [])
-    if not isinstance(v, list):
-        raise SpecError(f"[[{key}]] musí být pole bloků, ne jedna hodnota")
+    if not isinstance(v, list) or not all(isinstance(x, dict) for x in v):
+        raise SpecError(f"[[{key}]] musí být pole bloků, ne jedna hodnota ani seznam textů")
     return v
 
 
@@ -218,8 +230,8 @@ def from_dict(data: dict) -> Process:
         updated=_line(p.get("updated", "")),
         source=_line(p.get("source", "")),
         states_label=_line(p.get("states_label", "Stavy")),
-        today=_list(p.get("today")),
-        auto_flow=bool(p.get("auto_flow", True)),
+        today=_list(p.get("today"), "today", "[process]"),
+        auto_flow=_bool(p, "auto_flow", "[process]"),
         owner=_line(p.get("owner", "")),
         trigger=_line(p.get("trigger", "")),
         outcome=_line(p.get("outcome", "")),
@@ -237,7 +249,10 @@ def from_dict(data: dict) -> Process:
         w = f"[[step]] č. {i}"
         _unknown(d, "step", w, notes)
         items = []
-        for it in d.get("items", []):
+        raw_items = d.get("items", [])
+        if not isinstance(raw_items, list) or not all(isinstance(it, dict) for it in raw_items):
+            raise SpecError(f'{w}: items má být seznam dlaždic {{ title = "…", sub = "…" }}')
+        for it in raw_items:
             _unknown(it, "item", f"{w} items", notes)
             items.append(Item(title=_req(it, "title", f"{w} items"), sub=_line(it.get("sub", ""))))
         col = d.get("col")
@@ -247,8 +262,8 @@ def from_dict(data: dict) -> Process:
             id=_req(d, "id", w), lane=_req(d, "lane", w), title=_req(d, "title", w),
             type=_line(d.get("type", "task")), label=_line(d.get("label", "")), sub=_line(d.get("sub", "")),
             detail=_text(d.get("detail", "")), out=_line(d.get("out", "")), today=_line(d.get("today", "")),
-            col=col, items=items, tools=_list(d.get("tools")), time=_line(d.get("time", "")),
-            pain=_list(d.get("pain")), next=bool(d.get("next", True))))
+            col=col, items=items, tools=_list(d.get("tools"), "tools", w), time=_line(d.get("time", "")),
+            pain=_list(d.get("pain"), "pain", w), next=_bool(d, "next", w)))
     for i, d in enumerate(_blocks(data, "flow"), 1):
         w = f"[[flow]] č. {i}"
         _unknown(d, "flow", w, notes)
@@ -282,11 +297,17 @@ def load(path) -> Process:
         raise SpecError(TOML_HINT.format(ver=sys.version.split()[0]))
     try:
         with open(path, "rb") as fh:
-            data = tomllib.load(fh)
+            raw = fh.read()
     except FileNotFoundError:
         raise SpecError(f"soubor neexistuje: {path}") from None
     except OSError as e:
         raise SpecError(f"soubor nejde přečíst: {path} ({e.strerror})") from None
+    try:
+        text = raw.decode("utf-8-sig")  # BOM z Windows editorů nevadí
+    except UnicodeDecodeError:
+        raise SpecError(f"{path}: soubor není v kódování UTF-8 (třeba cp1250 z Windows); ulož ho jako UTF-8") from None
+    try:
+        data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as e:
         raise SpecError(f"{path}: neplatné TOML: {e}") from None
     return from_dict(data)

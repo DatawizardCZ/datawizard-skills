@@ -89,6 +89,15 @@ class EdgeHtml(unittest.TestCase):
         self.assertEqual(html.count("<!--"), 0)
         self.assertEqual(js_object(html, "nodeData")["step:x1"]["desc"], "konec </script> a <!--<script> tady")
 
+    def test_placeholder_markers_in_text_stay_literal(self):
+        d = base_spec()
+        marker = "a /*DETAILS*/null b /*STEPS*/null c /*RING*/null d /*DURATION*/0 e"
+        d["step"][0]["detail"] = marker
+        html = render(from_dict(d))
+        self.assertEqual(js_object(html, "nodeData")["step:x1"]["desc"], marker)
+        self.assertIsInstance(js_object(html, "steps"), list)
+        self.assertIsInstance(js_object(html, "duration"), (int, float))
+
     def test_without_states_and_questions(self):
         html = render(from_dict(base_spec()))
         self.assertNotIn('class="st hit"', html)

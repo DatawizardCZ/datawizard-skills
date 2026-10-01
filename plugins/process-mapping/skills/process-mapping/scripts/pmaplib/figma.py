@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -9,6 +10,7 @@ from .model import SpecError
 
 FIGMA_DIR = Path(__file__).resolve().parents[3] / "process-map-figma" / "scripts"
 TEMPLATES = {"build": "build-swimlane.js", "motion": "add-motion.js"}
+SLOTS = re.compile(r"/\*(LAYOUT|IDS)\*/null")
 MAX_CODE = 50000  # limit parametru code nástroje use_figma
 
 
@@ -20,11 +22,13 @@ def _literal(obj) -> str:
 def figma_code(L: dict, part: str, ids: Optional[dict] = None) -> str:
     if part not in TEMPLATES:
         raise SpecError(f"--part musí být build nebo motion, ne '{part}'")
-    code = (FIGMA_DIR / TEMPLATES[part]).read_text(encoding="utf-8").replace("/*LAYOUT*/null", _literal(L))
+    slots = {"LAYOUT": _literal(L)}
     if part == "motion":
         if not isinstance(ids, dict):
             raise SpecError("pro --part motion je potřeba --ids s objektem ids z výsledku build")
-        code = code.replace("/*IDS*/null", _literal(ids))
+        slots["IDS"] = _literal(ids)
+    # jeden průchod šablonou: značky uvnitř vloženého layoutu se už nenahrazují
+    code = SLOTS.sub(lambda m: slots[m.group(1)], (FIGMA_DIR / TEMPLATES[part]).read_text(encoding="utf-8"))
     if len(code) > MAX_CODE:
         raise SpecError(f"kód pro Figmu má {len(code)} znaků, use_figma unese {MAX_CODE}; rozděl proces na podprocesy")
     return code

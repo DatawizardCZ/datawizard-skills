@@ -40,6 +40,11 @@ class CliOutputs(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertTrue(target.exists())
 
+    def test_out_is_a_folder_is_a_clear_error(self):
+        rc, _, err = run(["html", str(self.spec), "-o", str(self.dir)])
+        self.assertEqual(rc, 1)
+        self.assertIn("CHYBA", err)
+
     def test_links_are_validated(self):
         ok = self.dir / "ok.html"
         rc, _, _ = run(["html", str(self.spec), "-o", str(ok), "--link", "Dokument=proces.md",
