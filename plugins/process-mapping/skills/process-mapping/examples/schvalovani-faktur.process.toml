@@ -1,0 +1,224 @@
+# Vzorový proces pluginu process-mapping. Celý je vymyšlený.
+# Pokrývá formát: start a konec, kontrolní krok s dlaždicemi, smyčku, rozhodnutí o dvou větvích
+# se sloučením (main s popiskem + alt), průběžnou roli, pět stavů (dva na stejném kroku),
+# otázky ke kroku i k roli, vyřešenou otázku a pole z mapování (vlastník, systémy, čas, bolesti).
+
+[process]
+id = "schvalovani-faktur"
+title = "Schvalování přijatých faktur"
+kind = "to-be"
+status = "k-validaci"
+version = "0.2"
+updated = "2026-10-01"
+source = "fiktivní vzor pluginu process-mapping"
+owner = "finanční manažer"
+trigger = "od dodavatele přijde faktura"
+outcome = "faktura je zaúčtovaná a uhrazená"
+purpose = "zadání pro vývoj modulu schvalování"
+volume = "zhruba 300 faktur měsíčně"
+states_label = "Stavy faktury"
+today = [
+  "Faktury chodí e-mailem i poštou a účetní je přepisuje ručně.",
+  "Ke schválení se nosí papírově, ztrácejí se na stolech.",
+  "Nikdo neví, kolik faktur právě čeká a u koho.",
+]
+
+[[lane]]
+id = "ucetni"
+name = "Účetní"
+access = "plný přístup"
+desc = "Přijímá faktury, doplňuje údaje a zaúčtovává."
+
+[[lane]]
+id = "system"
+name = "Systém"
+access = "automatika"
+desc = "Vytěží údaje, porovná je s objednávkou a rozpočtem a hlídá limit."
+
+[[lane]]
+id = "vedouci"
+name = "Vedoucí střediska"
+access = "schvalování svého střediska"
+desc = "Schvaluje faktury svého střediska."
+
+[[lane]]
+id = "reditel"
+name = "Ředitel"
+access = "schvalování nad limit"
+desc = "Schvaluje faktury nad limit."
+
+[[lane]]
+id = "controlling"
+name = "Controlling"
+access = "čtení"
+desc = "Sleduje čerpání rozpočtů."
+
+[[step]]
+id = "s1"
+lane = "ucetni"
+type = "start"
+title = "Přijme fakturu"
+sub = "e-mailem nebo poštou"
+detail = "Účetní nahraje fakturu do systému. Papírovou nejdřív naskenuje."
+out = "Faktura v systému"
+today = "Papírové faktury se přepisují ručně."
+tools = ["e-mail", "skener"]
+time = "2 min"
+
+[[step]]
+id = "s2"
+lane = "system"
+title = "Vytěží údaje"
+sub = "dodavatel, částka, splatnost"
+detail = "Systém přečte údaje z PDF a předvyplní je."
+out = "Předvyplněná faktura"
+tools = ["vytěžování PDF"]
+
+[[step]]
+id = "s3"
+lane = "ucetni"
+title = "Doplní středisko"
+sub = "a opraví vytěžené údaje"
+detail = "Účetní přiřadí středisko a objednávku a opraví, co systém přečetl špatně."
+out = "Faktura připravená ke kontrole"
+time = "3 min"
+pain = ["Dodavatelé posílají faktury bez čísla objednávky."]
+
+[[step]]
+id = "k"
+lane = "system"
+type = "checks"
+title = "Kontroly faktury"
+sub = "porovná s objednávkou a rozpočtem"
+detail = "Systém zkontroluje duplicitu, objednávku, rozpočet a splatnost. Výsledek ukáže účetní; při chybě se faktura vrací k opravě."
+out = "Výsledek kontrol"
+items = [
+  { title = "Duplicita", sub = "stejné číslo faktury" },
+  { title = "Objednávka", sub = "částka v toleranci" },
+  { title = "Rozpočet", sub = "zbývá na středisku" },
+  { title = "Splatnost", sub = "méně než 5 dní" },
+]
+
+[[step]]
+id = "s5"
+lane = "vedouci"
+title = "Schválí fakturu"
+sub = "v aplikaci, i z mobilu"
+detail = "Vedoucí vidí fakturu, objednávku a čerpání rozpočtu na jednom místě."
+out = "Schválená faktura"
+today = "Faktura se nosí k podpisu na papíře."
+time = "průměrně čeká 3 dny"
+pain = ["Při dovolené vedoucího faktury stojí."]
+
+[[step]]
+id = "s6"
+lane = "system"
+type = "decision"
+title = "Nad 50 000 Kč?"
+sub = "limit podle střediska"
+detail = "Faktury nad limit jdou ještě řediteli, ostatní rovnou k zaúčtování."
+
+[[step]]
+id = "s7"
+lane = "reditel"
+title = "Schválí ředitel"
+sub = "jen faktury nad limit"
+out = "Schválená faktura nad limit"
+
+[[step]]
+id = "s8"
+lane = "ucetni"
+title = "Zaúčtuje"
+sub = "a zařadí do platby"
+detail = "Účetní zaúčtuje fakturu a systém ji zařadí do nejbližšího platebního příkazu."
+out = "Faktura v platebním příkazu"
+tools = ["účetní systém"]
+
+[[step]]
+id = "s9"
+lane = "system"
+type = "end"
+title = "Uhrazeno"
+sub = "platba odešla z banky"
+out = "Uhrazená faktura"
+
+[[flow]]
+from = "k"
+to = "s3"
+kind = "loop"
+label = "opravit údaje"
+
+[[flow]]
+from = "s6"
+to = "s7"
+label = "nad limit"
+
+[[flow]]
+from = "s6"
+to = "s8"
+kind = "alt"
+label = "do limitu"
+
+[[span]]
+lane = "controlling"
+from = "s5"
+to = "s8"
+title = "Průběžně"
+text = "sleduje čerpání rozpočtu střediska"
+
+[[state]]
+id = "st1"
+name = "Přijatá"
+sub = "čeká na vytěžení"
+at = "s1"
+
+[[state]]
+id = "st2"
+name = "Ke schválení"
+sub = "u vedoucího"
+at = "s5"
+
+[[state]]
+id = "st3"
+name = "Schválená"
+sub = "připravená k zaúčtování"
+at = "s8"
+
+[[state]]
+id = "st4"
+name = "Zaúčtovaná"
+sub = "v platebním příkazu"
+at = "s8"
+
+[[state]]
+id = "st5"
+name = "Uhrazená"
+sub = "archiv"
+at = "s9"
+
+[[question]]
+ref = "s2"
+text = "Kolik faktur přichází jen v papíru?"
+who = "účetní"
+
+[[question]]
+ref = "k"
+text = "Jaká tolerance u částky je přijatelná?"
+who = "controlling"
+
+[[question]]
+ref = "s6"
+text = "Je limit 50 000 Kč pro všechna střediska stejný?"
+who = "ředitel"
+
+[[question]]
+ref = "vedouci"
+text = "Kdo schvaluje, když je vedoucí na dovolené?"
+who = "finanční manažer"
+
+[[question]]
+ref = "s7"
+text = "Může ředitel schválení delegovat?"
+status = "resolved"
+answer = "Ano, na finančního manažera."
+who = "ředitel"
