@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="no-referrer" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src __SCRIPT_HASHES__; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'" />
+<title>__TITLE__ · procesní mapa</title>
+<style>
+  :root {
+    --bg: #f8fafc; --panel-bg: #ffffff; --border: #e2e8f0; --text: #0f172a;
+    --text-muted: #64748b; --accent: #1168bd;
+    --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
+  }
+  /* výkres: blueprint (výchozí) a světlá varianta; proměnné na body, ať platí i ve fullscreen overlayi */
+  body {
+    --bp-sheet: #0b2545; --bp-paper: #081b38; --bp-grid-f: rgba(158,199,255,.055); --bp-grid-m: rgba(158,199,255,.11);
+    --bp-line: rgba(158,199,255,.22); --bp-line2: rgba(158,199,255,.38); --bp-band: rgba(158,199,255,.035);
+    --bp-box: rgba(11,37,69,.72); --bp-ink: #eaf2ff; --bp-mut: #9fb9dc; --bp-mut2: #5f7ba6;
+    --bp-cyan: #6fe3ff; --bp-cyan-dim: #3fa9c9; --bp-cyan-soft: rgba(111,227,255,.10); --bp-wire: #3fa9c9;
+    --bp-amber: #ffc861;
+  }
+  body.light { __LIGHT_VARS__ }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  header { padding: 1.1rem 1.75rem; border-bottom: 1px solid var(--border); background: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  header h1 { margin: 0 0 0.2rem 0; font-size: 1.1rem; font-weight: 600; }
+  header .meta { color: var(--text-muted); font-size: 0.82rem; }
+  .status-badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; border: 1px solid; margin-right: 0.4rem; vertical-align: 1px; }
+  .status-draft { background: #f1f5f9; border-color: #94a3b8; color: #334155; }
+  .status-k-validaci { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+  .status-schvaleno { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+  header nav a { color: var(--accent); text-decoration: none; font-size: 0.85rem; padding: 0.35rem 0.75rem; border: 1px solid var(--accent); border-radius: 6px; margin-left: 0.4rem; }
+  header nav a:hover { background: var(--accent); color: white; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(100vh - 76px); }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; height: auto; } }
+  main { overflow: auto; padding: 1.25rem 1.5rem; min-width: 0; }
+  aside { border-left: 1px solid var(--border); background: var(--panel-bg); overflow-y: auto; padding: 1.25rem; }
+  .pane-tools { display: flex; justify-content: flex-end; align-items: center; gap: 0.6rem 1rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+  .pane-tools label { font-size: 0.8rem; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; }
+  .pane-tools input { accent-color: var(--accent); }
+  .pane-tools button { font: 500 0.8rem/1.2 inherit; color: var(--accent); background: white; border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.7rem; cursor: pointer; }
+  .pane-tools button:hover, .pane-tools button[aria-pressed="true"] { border-color: var(--accent); }
+  .pane-tools button[aria-pressed="true"] { background: var(--accent); color: white; }
+  .step-hint { font-size: 0.78rem; color: var(--text-muted); }
+  .sheet { background: var(--bp-sheet); border: 1px solid var(--bp-line); border-radius: 8px; overflow: hidden; box-shadow: 0 30px 70px -35px rgba(2,10,24,.55); }
+  .sheet-head, .sheet-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 16px; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+  .sheet-head { border-bottom: 1px solid var(--bp-line); background: var(--bp-cyan-soft); font-size: 11px; color: var(--bp-mut); }
+  .sheet-foot { border-top: 1px solid var(--bp-line); font-size: 10.5px; color: var(--bp-mut2); }
+  .sheet-foot .ok { color: var(--bp-cyan); }
+  .sheet-body { padding: 14px; overflow-x: auto; }
+  .sheet-body #schema { display: block; width: 100%; height: auto; min-width: __MIN_WIDTH__px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted); }
+  .legend b { color: var(--text); font-weight: 600; }
+__SVG_CSS__
+  .hit { cursor: pointer; outline: none; }
+  .hit:hover .s-box, .hit:hover .s-box-soft, .hit:focus-visible .s-box, .hit:focus-visible .s-box-soft { stroke: var(--bp-cyan); }
+  .hit:hover .s-lane, .hit:focus-visible .s-lane { fill: var(--bp-cyan); }
+  .hit.sel .s-box, .hit.sel .s-box-hi, .hit.sel .s-box-soft { stroke: var(--bp-amber); stroke-width: 2.2; }
+  .hit.sel .s-lane { fill: var(--bp-amber); }
+  /* Bez JS (náhled přílohy) je výkres hotový. Skryté výchozí stavy platí jen pod .armed, kterou přidá JS. */
+  #schema.armed .draw { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  #schema.armed .node, #schema.armed .st, #schema.armed .ring, #schema.armed .tip { opacity: 0; }
+  #schema.armed.play .draw { animation: drawline .7s ease forwards; animation-delay: var(--d, 0s); }
+  #schema.armed.play .node { animation: nodein .55s ease forwards; animation-delay: var(--d, 0s); }
+  #schema.armed.play .tip { animation: nodein .15s ease forwards; animation-delay: var(--d, 0s); }
+  #schema.armed.play .st { animation: stdim .4s ease forwards, stlit .45s ease forwards; animation-delay: var(--d, 0s), var(--l, 0s); }
+  #schema.armed.play .ring { animation: nodein .3s ease __RING_IN__s forwards, ringmove __RING_TOTAL__s linear 0s forwards; }
+  @keyframes drawline { to { stroke-dashoffset: 0; } }
+  @keyframes nodein { to { opacity: 1; } }
+  @keyframes stdim { to { opacity: .35; } }
+  @keyframes stlit { from { opacity: .35; } to { opacity: 1; } }
+  @keyframes ringmove {
+    __RING_KEYFRAMES__
+  }
+  #schema .ring { transform: translateX(__RING_END__px); }
+  #schema.armed .ring { transform: none; }
+  /* krokování: další krok šipkou nebo mezerníkem */
+  #schema.stepping .draw { stroke-dasharray: 1 1; stroke-dashoffset: 1; transition: stroke-dashoffset .45s ease; }
+  #schema.stepping .draw.on, #schema.stepping .on .draw { stroke-dashoffset: 0; }
+  #schema.stepping .node, #schema.stepping .tip, #schema.stepping .st { opacity: 0; transition: opacity .3s ease; }
+  #schema.stepping .node.on, #schema.stepping .tip.on { opacity: 1; }
+  #schema.stepping .st.on { opacity: .35; }
+  #schema.stepping .st.on.lit { opacity: 1; }
+  #schema.stepping .ring { opacity: 0; transition: transform .35s ease, opacity .3s ease; }
+  #schema.stepping .ring.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    #schema.armed .draw, #schema.armed.play .draw { animation: none; stroke-dashoffset: 0; }
+    #schema.armed .node, #schema.armed.play .node, #schema.armed .st, #schema.armed.play .st,
+    #schema.armed .tip, #schema.armed.play .tip { animation: none; opacity: 1; }
+    #schema.armed .ring, #schema.armed.play .ring { animation: none; opacity: 1; transform: translateX(__RING_END__px); }
+  }
+  aside h2 { margin: 0 0 0.5rem 0; font-size: 1.02rem; }
+  aside h3 { margin: 1.1rem 0 0.4rem 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 600; }
+  aside p, aside li { font-size: 0.87rem; }
+  aside ul { padding-left: 1.1rem; margin: 0.3rem 0; }
+  .frame-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  .frame-table td { padding: 0.3rem 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .frame-table td:first-child { color: var(--text-muted); width: 34%; }
+  .q-list { list-style: none; padding: 0; }
+  .q-list li { margin: 0 0 0.35rem 0; }
+  .q-link { display: block; width: 100%; text-align: left; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 0.45rem 0.6rem; font: 0.83rem/1.4 inherit; color: var(--text); cursor: pointer; }
+  .q-link.pain { background: #fef2f2; border-color: #fecaca; }
+  .q-link:hover { border-color: #f59e0b; }
+  .q-step { display: block; font-size: 0.72rem; font-weight: 600; color: #92400e; margin-bottom: 0.1rem; }
+  .detail-back { background: none; border: none; color: var(--accent); cursor: pointer; font: 500 0.82rem/1.2 inherit; padding: 0; margin-bottom: 0.75rem; }
+  .detail-role { display: inline-block; font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 999px; padding: 0.1rem 0.55rem; margin: 0 0.3rem 0.6rem 0; }
+  .detail-description { padding: 0.75rem; background: var(--bg); border-radius: 6px; font-size: 0.9rem; white-space: pre-line; }
+  .detail-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.85rem; }
+  .detail-table td { padding: 0.45rem 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .detail-table td:first-child { color: var(--text-muted); width: 32%; font-weight: 500; }
+  .detail-q { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 0.4rem 0.6rem; margin: 0.35rem 0; font-size: 0.85rem; }
+  .detail-q.done { background: #f0fdf4; border-color: #bbf7d0; }
+  .detail-pain { background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.4rem 0.6rem; margin: 0.35rem 0; font-size: 0.85rem; }
+  .detail-src { font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+  @media print {
+    @page { size: landscape; margin: 10mm; }
+    body { background: white; __LIGHT_VARS__ }
+    header nav, .pane-tools, aside, .fs-btn { display: none !important; }
+    .layout { display: block; height: auto; }
+    main { overflow: visible; padding: 0; }
+    .sheet { box-shadow: none; }
+    .sheet-body { overflow: visible; }
+    .sheet-body #schema { min-width: 0 !important; }
+    #schema * { animation: none !important; transition: none !important; }
+    #schema .draw { stroke-dashoffset: 0 !important; }
+    #schema .node, #schema .st, #schema .tip, #schema .ring { opacity: 1 !important; }
+    #schema .ring { transform: translateX(__RING_END__px) !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>__TITLE__</h1>
+    <div class="meta">__META__</div>
+  </div>
+  <nav>__LINKS__</nav>
+</header>
+
+<div class="layout">
+  <main>
+    <div class="pane-tools">
+      <span class="step-hint" id="step-hint" hidden>← → nebo mezerník · Esc konec</span>
+      <button type="button" id="b-step" aria-pressed="false">Krokovat</button>
+      <button type="button" id="b-replay">↻ Přehrát znovu</button>
+      <button type="button" id="b-skip">Přeskočit animaci</button>
+      <label><input type="checkbox" id="t-light"> Světlý výkres</label>
+    </div>
+    <div class="sheet">
+      <div class="sheet-head"><span>__HEAD_LEFT__</span><span>__HEAD_RIGHT__</span></div>
+      <div class="sheet-body" id="sheet-body">
+        <p class="sr-only">__SR_TEXT__</p>
+        <div class="fs-host" id="schema-host">
+__SVG__
+        </div>
+      </div>
+      <div class="sheet-foot"><span>__FOOT_LEFT__</span><span class="ok">__FOOT_RIGHT__</span></div>
+    </div>
+    <div class="legend">
+      <span><b>Plná šipka</b> hlavní tok</span>
+      <span><b>Oranžová čárkovaná</b> návrat (smyčka)</span>
+      <span><b>Šedá čárkovaná</b> alternativa</span>
+      <span><b>Zvýrazněný rámeček</b> rozhodnutí</span>
+      <span><b>??</b> otevřená otázka</span>
+      <span><b>Klik</b> na krok, roli nebo stav = detail vpravo</span>
+    </div>
+  </main>
+  <aside>
+    <div id="detail"><div id="overview">
+__OVERVIEW__
+    </div></div>
+  </aside>
+</div>
+
+<script>__FULLSCREEN_SCRIPT__</script>
+<script>__MAIN_SCRIPT__</script>
+
+</body>
+</html>
