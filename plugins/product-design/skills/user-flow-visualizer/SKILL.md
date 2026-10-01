@@ -1,9 +1,11 @@
 ---
 name: user-flow-visualizer
-description: Vytvoří kompletní specifikaci user flows a sadu HTML prototypů pro jejich prohlížení v browseru. Použij tento skill kdykoli uživatel chce zmapovat, jak uživatelé procházejí aplikací nebo produktem — registrace, přihlášení, onboarding, join flow, platební flow, nebo jakýkoli jiný vícekrokový proces. Triggeruj na: "nakresli user flow", "zdokumentuj flow", "jak probíhá registrace", "zmapuj přihlašovací proces", "udělej z toho prototypy", "chci vidět flow v browseru", "napiš spec pro flow", "vizualizuj flow", "zdokumentuj jak funguje X". Triggeruj i když uživatel popíše flow slovně a chce ho mít zachycený. Komunikuj česky.
+description: Vytvoří kompletní specifikaci user flows a sadu HTML prototypů pro jejich prohlížení v browseru. Použij tento skill kdykoli uživatel chce zmapovat, jak uživatelé procházejí aplikací nebo produktem — registrace, přihlášení, onboarding, join flow, platební flow, nebo jakýkoli jiný vícekrokový průchod aplikací. Triggeruj na: "nakresli user flow", "zdokumentuj flow", "jak probíhá registrace", "zmapuj přihlašovací proces", "udělej z toho prototypy", "chci vidět flow v browseru", "napiš spec pro flow", "vizualizuj flow", "zdokumentuj jak funguje X". Triggeruj i když uživatel popíše flow slovně a chce ho mít zachycený. Firemní procesy s rolemi a předávkami (swimlane, as-is, to-be) kreslí process-mapping. Komunikuj česky.
 ---
 
 # User Flow Visualizer
+
+> Firemní procesy (role, předávky, as-is a to-be, swimlane, BPMN) kreslí plugin `process-mapping`. Tenhle skill je pro průchody obrazovkami aplikace.
 
 ## Co tento skill dělá
 
