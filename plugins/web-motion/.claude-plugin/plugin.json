@@ -1,6 +1,5 @@
 {
   "name": "web-motion",
-  "version": "0.1.0",
   "description": "Animated and interactive web patterns — animated demo windows (terminal, IDE, blueprint, CRT) and hook-switcher for live hero copy comparison",
   "author": {
     "name": "Karel Simek",

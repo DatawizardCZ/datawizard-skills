@@ -1,6 +1,5 @@
 {
   "name": "datawizard-core",
-  "version": "0.1.0",
   "description": "Markdown vault session workflow (start, wrap, ship) and global rules for the OS Datawizard system",
   "author": {
     "name": "Karel Simek",

@@ -1,6 +1,5 @@
 {
   "name": "process-mapping",
-  "version": "0.1.0",
   "description": "Process mapping end to end (frame, as-is, analysis, to-be, validation) and process diagrams from one TOML spec: animated HTML drawing with step-through mode, static SVG, Figma swimlane with motion, Mermaid; knowledge base of diagram types, notation, methods and tools",
   "author": {
     "name": "Karel Simek",
