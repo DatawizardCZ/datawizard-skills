@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --panel-2: #232730;
+    --text: #e7e9ee;
+    --muted: #9aa3b2;
+    --accent: #6aa9ff;
+    --accent-2: #4f8ce0;
+    --border: #2b303b;
+    --ok: #56d364;
+    --warn: #f0a93b;
+    --bad: #ef6b6b;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  header h1 {
+    font-size: 14px;
+    margin: 0;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .counter {
+    margin-left: auto;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+  .done-counter {
+    color: var(--ok);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .nav-buttons { display: flex; gap: 6px; }
+  button {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font: inherit;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  button:hover { background: var(--border); border-color: var(--accent); }
+  button.primary { background: var(--accent-2); border-color: var(--accent); color: white; }
+  button.primary:hover { background: var(--accent); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.done-btn {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #0b1b0e;
+    font-weight: 600;
+  }
+  button.done-btn:hover { filter: brightness(1.1); }
+  button.done-btn.is-done {
+    background: var(--panel-2);
+    border-color: var(--ok);
+    color: var(--ok);
+  }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 16px;
+    padding: 16px;
+    min-height: 0;
+  }
+  .image-panel, .text-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .image-panel {
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+  }
+  .image-panel img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    background: white;
+    cursor: zoom-in;
+  }
+  .image-panel.is-done img {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+  }
+  .image-panel .no-image {
+    color: var(--muted);
+    font-style: italic;
+  }
+  .text-panel {
+    padding: 18px;
+    overflow-y: auto;
+    position: relative;
+  }
+  .text-panel.is-done::before {
+    content: "✓ HOTOVO";
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: var(--ok);
+    color: #0b1b0e;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 1;
+  }
+  .text-panel.is-done h2 {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .text-panel h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  .text-panel .category {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .cat-bug { background: rgba(239,107,107,0.15); color: var(--bad); }
+  .cat-feature { background: rgba(106,169,255,0.15); color: var(--accent); }
+  .cat-decision { background: rgba(240,169,59,0.15); color: var(--warn); }
+  .cat-config { background: rgba(86,211,100,0.15); color: var(--ok); }
+  .cat-resolved { background: rgba(154,163,178,0.15); color: var(--muted); }
+
+  .quote {
+    background: var(--panel-2);
+    border-left: 3px solid var(--accent);
+    padding: 12px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 0 0 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .actions h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 14px 0 6px;
+  }
+  .actions ul { margin: 0 0 12px; padding-left: 20px; }
+  .actions li { margin-bottom: 4px; }
+  .copy-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    flex-wrap: wrap;
+  }
+  .done-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ok);
+    color: #0b1b0e;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .toast.show { opacity: 1; }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    cursor: zoom-out;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+  }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 45% 1fr; }
+    .text-panel { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-buttons">
+    <button id="prev" title="Předchozí (←)">‹ Předchozí</button>
+    <button id="next" title="Další (→)">Další ›</button>
+  </div>
+  <h1>{{HEADER_TITLE}}</h1>
+  <span class="done-counter" id="done-counter">✓ 0 / 0 hotovo</span>
+  <span class="counter" id="counter">1 / 1</span>
+</header>
+
+<main>
+  <div class="image-panel">
+    <img id="slide-img" alt="" src="">
+    <span class="no-image" id="no-image" style="display:none;">Bez obrázku</span>
+  </div>
+  <div class="text-panel">
+    <h2 id="slide-title"></h2>
+    <span class="category" id="slide-category"></span>
+    <div class="quote" id="slide-quote"></div>
+    <div class="actions">
+      <h3>Akce</h3>
+      <ul id="slide-actions"></ul>
+    </div>
+    <div class="copy-row">
+      <button class="primary" id="copy-original" title="Zkopíruje originální text pro kódovacího agenta">📋 Kopírovat originál pro agenta</button>
+      <button id="copy-full" title="Zkopíruje text + akce + odkaz na obrázek">📋 Kopírovat vše</button>
+      <button class="done-btn" id="toggle-done" title="Označit jako vyřešené (D)">✓ Hotovo</button>
+    </div>
+    <div class="done-meta" id="done-meta"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast">Zkopírováno</div>
+<div class="lightbox" id="lightbox"><img id="lightbox-img" alt=""></div>
+
+<script>
+// === REPLACE THIS WITH ACTUAL SLIDES ===
+const SLIDES = {{SLIDES_JSON}};
+const STORAGE_KEY = "{{STORAGE_KEY}}";
+// ========================================
+
+let current = 0;
+const $ = id => document.getElementById(id);
+
+function loadDone() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+function saveDone(state) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+let doneState = loadDone();
+
+function isDone(n) { return !!doneState[n]; }
+function toggleDone(n) {
+  if (doneState[n]) delete doneState[n];
+  else doneState[n] = { at: new Date().toISOString() };
+  saveDone(doneState);
+}
+
+function renderDoneCounter() {
+  const total = SLIDES.length;
+  const done = SLIDES.filter(s => isDone(s.n)).length;
+  const el = $('done-counter');
+  el.textContent = `✓ ${done} / ${total} hotovo`;
+  el.style.color = done === total && total > 0 ? 'var(--ok)' : (done > 0 ? 'var(--ok)' : 'var(--muted)');
+}
+
+function render() {
+  const s = SLIDES[current];
+  $('counter').textContent = `${s.n} / ${SLIDES.length}`;
+  $('slide-title').textContent = s.title;
+  const cat = $('slide-category');
+  cat.textContent = s.category;
+  cat.className = 'category ' + (s.catClass || '');
+  $('slide-quote').textContent = s.quote;
+  const ul = $('slide-actions');
+  ul.replaceChildren(...(s.actions || []).map(a => {
+    const li = document.createElement('li');
+    li.textContent = a;
+    return li;
+  }));
+  if (s.img) {
+    $('slide-img').src = s.img;
+    $('slide-img').style.display = '';
+    $('no-image').style.display = 'none';
+  } else {
+    $('slide-img').style.display = 'none';
+    $('no-image').style.display = '';
+  }
+  $('prev').disabled = current === 0;
+  $('next').disabled = current === SLIDES.length - 1;
+  history.replaceState(null, '', '#' + s.n);
+
+  const done = isDone(s.n);
+  document.querySelector('.text-panel').classList.toggle('is-done', done);
+  document.querySelector('.image-panel').classList.toggle('is-done', done);
+  const btn = $('toggle-done');
+  btn.classList.toggle('is-done', done);
+  btn.textContent = done ? '↶ Vrátit zpět' : '✓ Hotovo';
+  const meta = $('done-meta');
+  if (done) {
+    const at = doneState[s.n]?.at;
+    const when = at ? new Date(at).toLocaleString('cs-CZ') : '';
+    meta.textContent = when ? `Označeno jako vyřešeno: ${when}` : 'Označeno jako vyřešeno';
+  } else {
+    meta.textContent = '';
+  }
+  renderDoneCounter();
+}
+
+function go(delta) {
+  const next = current + delta;
+  if (next < 0 || next >= SLIDES.length) return;
+  current = next;
+  render();
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const t = $('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1400);
+  });
+}
+
+$('prev').onclick = () => go(-1);
+$('next').onclick = () => go(1);
+$('toggle-done').onclick = () => { toggleDone(SLIDES[current].n); render(); };
+
+$('copy-original').onclick = () => {
+  const s = SLIDES[current];
+  copyToClipboard(`Feedback bod ${s.n}: ${s.title}\n\n"${s.quote}"\n\n(Obrázek: ${s.img || 'bez obrázku'})`);
+};
+$('copy-full').onclick = () => {
+  const s = SLIDES[current];
+  const lines = [
+    `# Feedback bod ${s.n}: ${s.title}`,
+    ``,
+    `Kategorie: ${s.category}`,
+    `Obrázek: ${s.img || '—'}`,
+    ``,
+    `## Originál`,
+    ``,
+    `> ${s.quote.split('\n').join('\n> ')}`,
+    ``,
+    `## Akce`,
+    ``,
+    ...(s.actions || []).map(a => `- ${a}`)
+  ];
+  copyToClipboard(lines.join('\n'));
+};
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowLeft') go(-1);
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'Escape') $('lightbox').classList.remove('show');
+  if (e.key === 'd' || e.key === 'D') { toggleDone(SLIDES[current].n); render(); }
+});
+
+$('slide-img').onclick = () => {
+  $('lightbox-img').src = $('slide-img').src;
+  $('lightbox').classList.add('show');
+};
+$('lightbox').onclick = () => $('lightbox').classList.remove('show');
+
+const initial = parseInt(location.hash.replace('#', ''), 10);
+if (initial >= 1 && initial <= SLIDES.length) current = initial - 1;
+render();
+</script>
+
+</body>
+</html>
