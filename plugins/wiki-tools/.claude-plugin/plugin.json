@@ -1,6 +1,5 @@
 {
   "name": "wiki-tools",
-  "version": "0.1.0",
   "description": "Markdown wiki tools — ingest new content, lint quality, query knowledge base",
   "author": {
     "name": "Karel Simek",

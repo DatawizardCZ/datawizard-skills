@@ -10,7 +10,6 @@
     {
       "name": "datawizard-core",
       "description": "Ship workflow (commit + push) and global rules for the OS Datawizard system.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -20,7 +19,6 @@
     {
       "name": "project-os",
       "description": "Datawizard project-repo standard as skills — methodology primer (project-standard), new-project, migrate-project, delivery-item, project-audit; template-project v2 bundled.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -30,7 +28,6 @@
     {
       "name": "content-tools",
       "description": "Document conversion and processing tools — email-to-markdown, pdf-to-markdown, process-meeting-transcript, generate-images.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -40,7 +37,6 @@
     {
       "name": "client-delivery",
       "description": "Client work tools — discovery process, email preparation, project scaffolding.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -50,7 +46,6 @@
     {
       "name": "product-design",
       "description": "Complete product design and prototyping pipeline — Design Thinking process, wireframing, HTML prototyping, branding, backlog building, business cases, and UI/UX intelligence.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -60,7 +55,6 @@
     {
       "name": "business-advice",
       "description": "Business consultant personas — Hormozi direct-advice style and Inizio (Czech entrepreneur) style.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -70,7 +64,6 @@
     {
       "name": "wiki-tools",
       "description": "Markdown wiki tools — ingest new content, lint quality, query knowledge base.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -80,7 +73,6 @@
     {
       "name": "web-conversion",
       "description": "Plan and execute web project conversions from prototypes (Lovable, etc.) into production-ready stacks, or scaffold new projects from architectural templates.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -90,7 +82,6 @@
     {
       "name": "web-motion",
       "description": "Animated and interactive web patterns — animated demo windows (terminal typewriter, IDE, blueprint pipeline, CRT boot) and hook-switcher for live hero copy comparison on prototypes.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -100,7 +91,6 @@
     {
       "name": "knowledge-capture",
       "description": "Knowledge capturing from external sources — YouTube playlist/channel transcripts to markdown + Excel, and a web research guide (WebFetch, Playwright, Brave Search API, Browserless) with cost rules.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },
@@ -110,7 +100,6 @@
     {
       "name": "process-mapping",
       "description": "Process mapping end to end and process diagrams from one TOML spec (animated HTML drawing with step-through, static SVG, Figma swimlane with motion, Mermaid), plus a knowledge base of diagram types, notation, methods and tools.",
-      "version": "0.1.0",
       "author": {
         "name": "Karel Simek"
       },

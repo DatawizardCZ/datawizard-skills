@@ -32,7 +32,7 @@ Repo: [github.com/Karyzard/datawizard-skills](https://github.com/Karyzard/datawi
 ### 1. Přidej marketplace (jednorázově)
 
 ```
-/plugin marketplace add Karyzard/datawizard-skills
+/plugin marketplace add DatawizardCZ/datawizard-skills
 ```
 
 > ⚠️ **Důležité:** repo musí být veřejné. Claude Code zatím nepodporuje autentizaci k privátním repos pro marketplace.
@@ -69,12 +69,14 @@ Skill list zobrazíš příkazem `/plugin`.
 
 ### Aktualizace
 
-Když na repu vyjde nová verze:
+Pluginy nemají pevné číslo verze, Claude Code je verzuje podle commitu. Každý merge do `main` je tedy nová verze. S `autoUpdate` se stáhne sama, ručně:
 
 ```
 /plugin marketplace update datawizard-skills
 /plugin update <plugin-name>@datawizard-skills
 ```
+
+Do `plugin.json` ani `marketplace.json` proto nepiš `version`. S pevným číslem by Claude Code držel starou kopii z cache, dokud se číslo nezmění.
 
 ### Odinstalace
 

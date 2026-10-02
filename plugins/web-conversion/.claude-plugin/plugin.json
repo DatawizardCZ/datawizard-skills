@@ -1,6 +1,5 @@
 {
   "name": "web-conversion",
-  "version": "0.1.0",
   "description": "Plan and execute web project conversions from prototypes (Lovable, etc.) into production-ready stacks (Astro, Next.js + Supabase, Vite + Supabase, static HTML), or scaffold new projects from architectural templates",
   "author": {
     "name": "Karel Simek",
