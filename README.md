@@ -25,7 +25,7 @@ Repo: [github.com/Karyzard/datawizard-skills](https://github.com/Karyzard/datawi
 | [knowledge-capture](plugins/knowledge-capture/) | Sběr znalostí z externích zdrojů — přepisy YouTube playlistů/kanálů, průvodce web research nástroji (zdarma vs. placené) |
 | [process-mapping](plugins/process-mapping/) | Mapování procesů od rámce po schválené to-be, procesní mapy z jednoho popisu (animovaný HTML výkres s krokováním, SVG, Figma s animací, Mermaid) a znalostní báze typů diagramů, notace a nástrojů |
 
-> Osobní pluginy (talent-coaching, writing-style, start/wrap session workflow, ivo-cdo-advisor) se přesunuly do samostatného repa `karel-skills` (2026-09-05). Tohle repo obsahuje jen skilly použitelné kýmkoliv z Datawizardu.
+> Osobní pluginy (talent-coaching, writing-style, start/wrap session workflow, ivo-cdo-advisor) se přesunuly do samostatného soukromého repa `karel-simek-skills` (2026-09-05). Tohle repo obsahuje jen skilly použitelné kýmkoliv z Datawizardu.
 
 ## Instalace pro Claude Code
 
@@ -35,7 +35,7 @@ Repo: [github.com/Karyzard/datawizard-skills](https://github.com/Karyzard/datawi
 /plugin marketplace add DatawizardCZ/datawizard-skills
 ```
 
-> ⚠️ **Důležité:** repo musí být veřejné. Claude Code zatím nepodporuje autentizaci k privátním repos pro marketplace.
+> Marketplace může být i soukromé repo. Claude Code použije tvoje git přihlášení k GitHubu (ověřeno 2026-10-02).
 
 Po úspěchu uvidíš: `Successfully added marketplace: datawizard-skills`
 
