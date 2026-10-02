@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "datawizard-skills",
-  "description": "Thematic skill plugins for the OS Datawizard system — project-repo standard, content tools, client delivery, product design, business advice, and wiki tools. Team-shared; personal plugins live in karel-skills.",
+  "description": "Thematic skill plugins for the OS Datawizard system — project-repo standard, content tools, client delivery, product design, business advice, and wiki tools. Team-shared; personal plugins live in karel-simek-skills.",
   "owner": {
     "name": "Karel Simek",
     "email": "datawizard.bi@gmail.com"
