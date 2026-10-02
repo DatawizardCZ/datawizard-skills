@@ -16,7 +16,7 @@ Repo: [github.com/Karyzard/datawizard-skills](https://github.com/Karyzard/datawi
 | [datawizard-core](plugins/datawizard-core/) | Workflow `ship` (commit + push) + globální pravidla |
 | [project-os](plugins/project-os/) | Standard projektových rep `project-*`: metodika, založení, migrace, delivery itemy, audit; šablona repa uvnitř |
 | [content-tools](plugins/content-tools/) | Konverze dokumentů (email, PDF, přepisy schůzek) a generování obrázků |
-| [client-delivery](plugins/client-delivery/) | Klientská práce — discovery, příprava emailů, scaffolding |
+| [client-delivery](plugins/client-delivery/) | Klientská práce: discovery, blindspot pass, feedback od klienta, měření před Google Ads, příprava emailů, scaffolding |
 | [product-design](plugins/product-design/) | Design Thinking pipeline, prototyping, UI/UX intelligence |
 | [business-advice](plugins/business-advice/) | Konzultantské persony (Hormozi, Inizio) |
 | [wiki-tools](plugins/wiki-tools/) | Markdown wiki — ingest, lint, query |
